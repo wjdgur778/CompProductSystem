@@ -1,6 +1,7 @@
 package com.example.CompProductSystem.api.Category;
 
-import com.example.CompProductSystem.api.Category.dto.CategoryResponse;
+import com.example.CompProductSystem.api.Category.dto.request.CategoryRequest;
+import com.example.CompProductSystem.api.Category.dto.response.CategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,29 +18,41 @@ public class CategoryService {
      */
     private final CategoryRepository categoryRepository;
 
-    public void createCategory(){
-
-    }
-
     /**
-     * @implNote 최상위 카테고리 조회
-     * @return 카테고리 dto
+     * @apiNote  최상위 카테고리 조회
+     * @return CategoryResponse
      */
     public List<CategoryResponse> getTopCategories() {
         return categoryRepository.findByParentIsNull().stream()
-                .map(category -> CategoryResponse.of(category))
+                .map(CategoryResponse::of)
                 .collect(Collectors.toList());
     }
 
     /**
-     * @implNote 하위 카테고리 조회
+     * @apiNote  하위 카테고리 조회
      * @param categoryId
-     * @return
+     * @return CategoryResponse
      */
     public List<CategoryResponse> getChildCategories(Long categoryId) {
 
         return categoryRepository.findByParentId(categoryId).stream()
-                .map(category -> CategoryResponse.of(category))
+                .map(CategoryResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * @apiNote 최상위 카테고리 생성
+     * @param categoryRequest
+     */
+    public void createTopCategory(CategoryRequest categoryRequest) {
+        categoryRepository.save(CategoryRequest.toEntity(categoryRequest));
+    }
+
+    /**
+     * @apiNote 하위 카테고리 생성
+     * @param categoryRequest
+     */
+    public void createDownCategory(CategoryRequest categoryRequest) {
+        categoryRepository.save(CategoryRequest.toEntity(categoryRequest));
     }
 }

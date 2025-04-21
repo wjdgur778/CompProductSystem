@@ -19,7 +19,7 @@ public class Member {
 
     //member 저장 시에 연관된 엔티티인 product를 함께 저장하기위한 cascadeType.ALL 설정
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "member",cascade = CascadeType.ALL)
-    @BatchSize(size = 2)
+//    @BatchSize(size = 2)
     List<Product> products = new ArrayList<>();
 
     public void addProduct(Product product){

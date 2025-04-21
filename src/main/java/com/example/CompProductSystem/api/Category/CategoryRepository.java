@@ -11,7 +11,7 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
      * @implNote 최상위 카테고리 조회
      * @return
      */
-//    @Query("select c from Category c where c.parent.id = null")
+    @Query("select c from Category c where c.parentId is null")
     List<Category> findByParentIsNull();
 
     /**
@@ -19,6 +19,6 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
      * @param parentId
      * @return
      */
-    @Query("select c from Category c where c.id = :parentId")
+    @Query("select c from Category c where c.parentId = :parentId")
     List<Category> findByParentId(@Param("parentId") Long parentId);
 }

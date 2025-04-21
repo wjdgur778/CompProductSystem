@@ -8,6 +8,4 @@ import lombok.Data;
 public class Result<T> {
     String message;
     T data;
-
-
 }

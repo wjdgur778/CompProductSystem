@@ -1,20 +1,16 @@
-package com.example.CompProductSystem.api.Category.dto;
+package com.example.CompProductSystem.api.Category.dto.response;
 
 import com.example.CompProductSystem.api.Category.Category;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Builder
 public class CategoryResponse {
     String name;
     private List<CategoryResponse> children;
-
-
-
 
     public static CategoryResponse of (Category category){
         return CategoryResponse.builder()
