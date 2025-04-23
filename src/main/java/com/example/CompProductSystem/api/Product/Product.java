@@ -1,8 +1,12 @@
 package com.example.CompProductSystem.api.Product;
 
+import com.example.CompProductSystem.api.Category.Category;
 import com.example.CompProductSystem.api.Member.Member;
+import com.example.CompProductSystem.api.PriceInfo.PriceInfo;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -25,10 +29,32 @@ public abstract class Product {
     private String name;// 상품 이름
     private LocalTime releaseDate;// 등록 월
     private String imageUrl; // s3를 활용한 이미지 링크 필드
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;// 멤버와의 manytoone 관계
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CATEGORY_ID")
+    private Category category;
+
+    /*
+        todo
+         OneToMany 관계를 맺을지 관계를 맺지 않고 prodcut 조회 후에 요청을 한번 더 받을지를 고민했다.
+         페이징 처리를 통해 한정된 응답을 보내줄 것이며, 한번에 보여져야하는 요구사항에 맞춰 관계를 맺기로 했다.
+     */
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_id")
+    @BatchSize(size = 5) // 배치사이즈 고려할 필요가 있다.
+    private List<PriceInfo> priceInfo; //
+
+
+    protected Product(String name, LocalTime releaseDate, String imageUrl, Member member, Category category) {
+        this.name = name;
+        this.releaseDate = releaseDate;
+        this.imageUrl = imageUrl;
+        this.member = member;
+        this.category = category;
+    }
 
     /**
      * 외부에서 사용할 수 없도록
@@ -38,19 +64,17 @@ public abstract class Product {
      * @param member
      */
 
-    public void setMember(Member member) {
+    public void changeMember(Member member) {
+        if (this.member != null) {
+            this.member.getProducts().remove(this);
+        }
         this.member = member;
-        member.getProducts().add(this);
+        if (member != null) {
+            member.getProducts().add(this);
+        }
     }
-    public void setName(String name){
-        this.name = name;
+
+    protected void changeCategory(Category category) {
+        this.category = category;
     }
-
-//
-//    @Builder
-//    public Product(String name){
-//        this.name = name;
-//    }
-
-
 }

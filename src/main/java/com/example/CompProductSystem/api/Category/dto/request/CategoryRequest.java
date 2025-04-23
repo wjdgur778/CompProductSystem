@@ -1,21 +1,25 @@
 package com.example.CompProductSystem.api.Category.dto.request;
 
 import com.example.CompProductSystem.api.Category.Category;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.springframework.lang.Nullable;
 
-@Data
-@NoArgsConstructor
+@Getter
 public class CategoryRequest {
     @NonNull
-    String name;
+    private String name;
 
     @Nullable
-    Long parentId;
+    private Long parentId;
 
-    public static Category toEntity(CategoryRequest categoryRequest){
-        return new Category(categoryRequest.getName(),categoryRequest.getParentId());
+    @Nullable
+    private String path;
+
+    public static Category toEntity(CategoryRequest categoryRequest) {
+        return Category.builder()
+                .name(categoryRequest.getName())
+                .parentId(categoryRequest.getParentId())
+                .parentPath(categoryRequest.getPath())
+                .build();
     }
 }

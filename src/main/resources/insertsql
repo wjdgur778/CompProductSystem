@@ -1,0 +1,54 @@
+-- 카테고리 생성
+INSERT INTO category (name, parent_id, path) VALUES
+('전자기기', NULL, '전자기기'),
+('노트북', 1, '전자기기/노트북'),
+('게이밍노트북', 2, '전자기기/노트북/게이밍노트북'),
+('사무용노트북', 2, '전자기기/노트북/사무용노트북'),
+('TV', 1, '전자기기/TV'),
+('가구', NULL, '가구'),
+('의자', 6, '가구/의자'),
+('책상', 6, '가구/책상');
+
+-- 회원 생성
+INSERT INTO member (name) VALUES
+('홍길동'),
+('김철수'),
+('이영희');
+
+-- 상품 생성 (노트북)
+INSERT INTO product (name, release_date, image_url, member_id, category_id, dtype) VALUES
+('LG 그램', '12:00:00', 'https://example.com/lg-gram.jpg', 1, 2, 'Laptop'),
+('삼성 갤럭시북', '12:00:00', 'https://example.com/galaxy-book.jpg', 2, 2, 'Laptop'),
+('레노버 게이밍', '12:00:00', 'https://example.com/lenovo-gaming.jpg', 3, 3, 'Laptop'),
+('맥북 프로', '12:00:00', 'https://example.com/macbook-pro.jpg', 1, 4, 'Laptop');
+
+-- 상품 생성 (TV)
+INSERT INTO product (name, release_date, image_url, member_id, category_id, dtype) VALUES
+('삼성 QLED', '12:00:00', 'https://example.com/samsung-qled.jpg', 2, 5, 'TV'),
+('LG OLED', '12:00:00', 'https://example.com/lg-oled.jpg', 3, 5, 'TV');
+
+-- 상품 생성 (가구)
+INSERT INTO product (name, release_date, image_url, member_id, category_id, dtype) VALUES
+('게이밍 의자', '12:00:00', 'https://example.com/gaming-chair.jpg', 1, 7, 'furniture'),
+('사무용 책상', '12:00:00', 'https://example.com/office-desk.jpg', 2, 8, 'furniture');
+
+-- 가격 정보 생성 (product_id는 실제 생성된 product의 id를 사용해야 합니다)
+-- 각 INSERT 문을 실행한 후 실제 생성된 ID를 확인하고 그 ID를 사용해야 합니다.
+-- 예시로 1부터 8까지의 ID를 사용했지만, 실제로는 생성된 ID를 사용해야 합니다.
+INSERT INTO price_info (price, delivery_fee, link_url, updated_at, product_id) VALUES
+(1500000, 3000, 'https://shop1.com/lg-gram', '2024-03-20 12:00:00', 1),
+(1600000, 0, 'https://shop2.com/lg-gram', '2024-03-20 12:00:00', 1),
+(1300000, 5000, 'https://shop1.com/galaxy-book', '2024-03-19 12:00:00', 2),
+(1400000, 0, 'https://shop2.com/galaxy-book', '2024-03-19 12:00:00', 2),
+(2000000, 0, 'https://shop1.com/lenovo-gaming', '2024-03-18 12:00:00', 3),
+(1900000, 3000, 'https://shop2.com/lenovo-gaming', '2024-03-18 12:00:00', 3),
+(2500000, 0, 'https://shop1.com/macbook-pro', '2024-03-17 12:00:00', 4),
+(2600000, 0, 'https://shop2.com/macbook-pro', '2024-03-17 12:00:00', 4),
+(3000000, 0, 'https://shop1.com/samsung-qled', '2024-03-16 12:00:00', 5),
+(2800000, 3000, 'https://shop2.com/samsung-qled', '2024-03-16 12:00:00', 5),
+(3500000, 0, 'https://shop1.com/lg-oled', '2024-03-15 12:00:00', 6),
+(3300000, 0, 'https://shop2.com/lg-oled', '2024-03-15 12:00:00', 6),
+(150000, 0, 'https://shop1.com/gaming-chair', '2024-03-14 12:00:00', 7),
+(160000, 3000, 'https://shop2.com/gaming-chair', '2024-03-14 12:00:00', 7),
+(200000, 0, 'https://shop1.com/office-desk', '2024-03-13 12:00:00', 8),
+(220000, 0, 'https://shop2.com/office-desk', '2024-03-13 12:00:00', 8);

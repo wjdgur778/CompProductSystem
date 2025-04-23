@@ -1,15 +1,18 @@
 package com.example.CompProductSystem.api.Category;
 
 import com.example.CompProductSystem.api.Category.dto.request.CategoryRequest;
+import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import com.example.CompProductSystem.common.dto.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -17,8 +20,7 @@ public class CategoryController {
      * @apiNote  최상위 카테고리 조회
      */
     @GetMapping("/top")
-    public ResponseEntity<Result> getTopCategories(){
-
+    public ResponseEntity<Result> getTopCategories() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
                         .data(categoryService.getTopCategories())
@@ -27,36 +29,38 @@ public class CategoryController {
 
     /**
      * @apiNote  특정 카테고리의 하위 카테고리 리스트 조회
-     * @param categoryId
+     * @param parentId
      */
-    @GetMapping("/down/{id}")
-    public ResponseEntity<Result> getCategories(@PathVariable Long categoryId){
+    @GetMapping("/{parentId}/child")
+    public ResponseEntity<Result> getChildCategories(@PathVariable Long parentId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
-                        .data(categoryService.getChildCategories(categoryId))
+                        .data(categoryService.getChildCategories(parentId))
                         .build());
     }
 
     /**
      * @apiNote  최상위 카테고리 생성 , 초기 데이터 생성을 위해 단순한 구성
-     * @param    parentId 를 비운다.
+     * @param    카테고리이름,카테고리타입 / parentId 를 비운다.
      * @return
      */
     @PostMapping("/top")
-    public void createTopCategory(@RequestBody CategoryRequest categoryRequest){
-        categoryService.createTopCategory(categoryRequest);
+    public ResponseEntity<Void> createTopCategory(@RequestBody CategoryRequest request) {
+        categoryService.createTopCategory(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
      * @apiNote  특정 카테고리에 대한 하위 카테고리 생성, 초기 데이터 생성을 위해 단순한 구성
-     * @param    parentId 를 채운다.
+     * @param    카테고리이름,카테고리타입,parentId
      * @return
      */
-    @PostMapping("/down")
-    public void createDownCategory(@RequestBody CategoryRequest categoryRequest){
-        categoryService.createDownCategory(categoryRequest);
+    @PostMapping("/child")
+    public ResponseEntity<Void> createChildCategory(
+            @RequestBody CategoryRequest request
+    ) {
+        categoryService.createDownCategory(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
-
 
 }

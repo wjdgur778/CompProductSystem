@@ -1,36 +1,45 @@
 package com.example.CompProductSystem.api.Category;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // ex. 게이밍 노트북
-//    연관관계를 맺으면 같은 테이블내에서 join이 일어나므로 연관관계를 맺기 보다는
-//    필드에 키를 넣는 방식을 선택
+    @Column(nullable = false)
+    private String name;
+
+    @Column(name = "parent_id")
     private Long parentId;
 
-    public Category (String name,Long parentId){
+    @Column(nullable = false)
+    private String path;
+
+    @Builder
+    protected Category(String name, Long parentId, String parentPath) {
         this.name = name;
         this.parentId = parentId;
+        this.path = parentPath != null ? parentPath + "/" + name : name;
     }
 
-    public void setParent(Long parentId) {
-        this.parentId = parentId;
-    }
-    public void setName(String name) {
+    protected void changeName(String name) {
         this.name = name;
+        if (isRoot()) {
+            this.path = name;
+        }
     }
 
+    protected void changeParent(Long parentId, String parentPath) {
+        this.parentId = parentId;
+        this.path = parentPath + "/" + this.name;
+    }
+
+    protected boolean isRoot() {
+        return parentId == null;
+    }
 }

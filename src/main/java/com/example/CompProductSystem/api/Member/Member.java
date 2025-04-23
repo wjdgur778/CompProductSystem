@@ -18,18 +18,26 @@ public class Member {
     private String name;
 
     //member 저장 시에 연관된 엔티티인 product를 함께 저장하기위한 cascadeType.ALL 설정
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "member",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "member",cascade = CascadeType.ALL)
 //    @BatchSize(size = 2)
-    List<Product> products = new ArrayList<>();
+    private final List<Product> products = new ArrayList<>();
 
-    public void addProduct(Product product){
-        this.products.add(product);
-        product.setMember(this);
-    }
     @Builder
-    public Member(String name){
+    protected Member(String name) {
         this.name = name;
     }
 
+    protected void addProduct(Product product) {
+        this.products.add(product);
+        if (product.getMember() != this) {
+            product.changeMember(this);
+        }
+    }
 
+    protected void removeProduct(Product product) {
+        this.products.remove(product);
+        if (product.getMember() == this) {
+            product.changeMember(null);
+        }
+    }
 }
