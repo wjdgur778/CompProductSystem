@@ -16,7 +16,7 @@ public class ProductController {
 
     private final ProductService productService;
     /**
-     * @return
+     *
      * @apiNote 모든 상품 리스트 조회
      * @return 해당 카테고리의 상품 목록을 페이징하여 반환
      */
@@ -52,7 +52,7 @@ public class ProductController {
      */
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Result> getProductsByCategory(
-        @PathVariable Long categoryId,
+        @PathVariable("categoryId") Long categoryId,
         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -69,13 +69,12 @@ public class ProductController {
      */
     @GetMapping("/category/{categoryId}/including-children")
     public ResponseEntity<Result> getProductsByCategoryIncludingChildren(
-        @PathVariable Long categoryId,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+        @PathVariable("categoryId") Long categoryId,
+        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
                         .data(productService.getProductsByCategoryIncludingChildren(categoryId, pageable))
                         .build());
     }
-
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
 /**
  * index 적용 방식
  */
@@ -19,7 +20,7 @@ public class PriceInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String name;
     private Long price;
     private Integer deliveryFee;
     private String linkUrl; // 제휴 링크
@@ -27,10 +28,11 @@ public class PriceInfo {
     private LocalDateTime updatedAt;
 
     @Builder
-    protected PriceInfo(Long price, Integer deliveryFee, String linkUrl) {
+    public PriceInfo(Long price, Integer deliveryFee, String linkUrl, String name) {
         this.price = price;
         this.deliveryFee = deliveryFee;
         this.linkUrl = linkUrl;
+        this.name = name;
         this.updatedAt = LocalDateTime.now();
     }
 

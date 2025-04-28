@@ -18,12 +18,12 @@ public class Member {
     private String name;
 
     //member 저장 시에 연관된 엔티티인 product를 함께 저장하기위한 cascadeType.ALL 설정
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "member",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
 //    @BatchSize(size = 2)
     private final List<Product> products = new ArrayList<>();
 
     @Builder
-    protected Member(String name) {
+    public Member(String name) {
         this.name = name;
     }
 

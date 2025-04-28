@@ -3,6 +3,10 @@ package com.example.CompProductSystem.api.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Table(name = "CATEGORY",indexes ={
+        @Index(name = "idx_path", columnList = "path")
+    }
+)
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +25,7 @@ public class Category {
     private String path;
 
     @Builder
-    protected Category(String name, Long parentId, String parentPath) {
+    public Category(String name, Long parentId, String parentPath) {
         this.name = name;
         this.parentId = parentId;
         this.path = parentPath != null ? parentPath + "/" + name : name;

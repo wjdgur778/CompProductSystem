@@ -23,10 +23,7 @@ public class ProductService {
      * @param pageable   페이지 정보
      * @return 해당 카테고리의 상품들을 페이징하여 ProductResponse DTO로 변환한 결과
      */
-    public Page<ProductResponse> getProductsByCategory(
-            Long categoryId,
-            Pageable pageable
-    ) {
+    public Page<ProductResponse> getProductsByCategory(Long categoryId, Pageable pageable) {
         return productRepository.findByCategoryId(categoryId, pageable)
                 .map(ProductResponse::from);
     }
@@ -40,18 +37,16 @@ public class ProductService {
      * @return 해당 카테고리와 하위 카테고리의 모든 상품들을 페이징하여 ProductResponse DTO로 변환한 결과
      * @throws IllegalArgumentException 카테고리 ID가 존재하지 않는 경우
      */
-    public Page<ProductResponse> getProductsByCategoryIncludingChildren(
-            Long categoryId,
-            Pageable pageable
-    ) {
+    public Page<ProductResponse> getProductsByCategoryIncludingChildren(Long categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
 
-        return productRepository.findByCategoryPathStartingWith(
+        return productRepository.findByCategoryPath(
                 category.getPath(),
                 pageable
         ).map(ProductResponse::from);
     }
+
 
 
 }

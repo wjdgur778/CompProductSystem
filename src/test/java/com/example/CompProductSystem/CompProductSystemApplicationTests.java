@@ -7,7 +7,10 @@ import com.example.CompProductSystem.api.Member.MemberRepository;
 import com.example.CompProductSystem.api.Member.MemberService;
 import com.example.CompProductSystem.api.Product.Product;
 import com.example.CompProductSystem.api.Product.ProductRepository;
+import com.example.CompProductSystem.api.Product.ProductService;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Laptop;
+import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Furniture;
+import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,9 +19,13 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -30,6 +37,10 @@ class CompProductSystemApplicationTests {
     MemberRepository memberRepository;
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    ProductService productService;
+
     @Autowired
     CategoryRepository categoryRepository;
 
@@ -39,159 +50,85 @@ class CompProductSystemApplicationTests {
     @PersistenceContext
     EntityManager em;
 
-    //    @BeforeEach
-//    void init() {
-//        initData.initData();
-//        /**
-//         * Member 1 .. n Product
-//         *
-//         *  1 - 1,2,3
-//         *  2 - 4,5,6
-//         *  3 - 7,8,9
-//         *  4 - 10,11,12
-//         *  5 - 13,14,15
-//         *
-//         */
-//
-//        //테스트가 하나의 transaction에 존재하므로 member와 product가 이미 영속성 컨텍스트에 존재할거야.
-////		em.flush();
-////		em.clear();
-//    }
     @Test
     @Transactional
-    void N_1_문제_확인() throws Exception {
-// 먼저 Member 객체를 저장
-        Member m1 = new Member("m1");
+    void getProductsByCategoryIncludingChildren_test() throws Exception {
+        // Create root category
+        Category laptopCategory = new Category("노트북", null, null);
+        Category furnitureCategory = new Category("가구", null, null);
+        categoryRepository.save(laptopCategory);
+        categoryRepository.save(furnitureCategory);
 
-        Product p1 = new Laptop();
-        m1.addProduct(p1); // 내부에서 setMember 수행
+        // Create child categories
+        Category gamingLaptopCategory = new Category("게이밍노트북", laptopCategory.getId(), laptopCategory.getPath());
+        Category businessLaptopCategory = new Category("사무용노트북", laptopCategory.getId(), laptopCategory.getPath());
+        categoryRepository.save(gamingLaptopCategory);
+        categoryRepository.save(businessLaptopCategory);
 
-        Product p3 = new Laptop();
-        m1.addProduct(p3); // 내부에서 setMember 수행
+        Category chairCategory = new Category("의자", furnitureCategory.getId(), furnitureCategory.getPath());
+        categoryRepository.save(chairCategory);
 
-        memberRepository.save(m1); // 먼저 Member 저장 (연관 관계가 설정된 상태에서)
+        Category officeChairCategory = new Category("사무용의자", chairCategory.getId(), chairCategory.getPath());
+        categoryRepository.save(officeChairCategory);
+//
+        // Create 500 products for each leaf category
+        for (int i = 0; i < 10000; i++) {
 
-        productRepository.save(p1); // Product 저장
-        productRepository.save(p3); // Product 저장
+            Furniture officeChairProduct = Furniture.builder()
+                    .name("Office Chair " + i)
+                    .category(officeChairCategory)
+                    .build();
+            productRepository.save(officeChairProduct);
 
-        Member m2 = new Member("m2");
+            Laptop gamingProduct = Laptop.builder()
+                .name("Gaming Laptop " + i)
+                .category(gamingLaptopCategory)
+                .monitorSize(15.6)
+                .build();
+            productRepository.save(gamingProduct);
 
-        Product p2 = new Laptop();
-        m2.addProduct(p2); // 내부에서 setMember 수행
+            Furniture ChairProduct = Furniture.builder()
+                    .name("Office Chair " + i)
+                    .category(chairCategory)
+                    .build();
+            productRepository.save(ChairProduct);
 
-        Product p4 = new Laptop();
-        m2.addProduct(p4); // 내부에서 setMember 수행
+            Laptop businessProduct = Laptop.builder()
+                .name("Business Laptop " + i)
+                .category(businessLaptopCategory)
+                .monitorSize(14.0)
+                .build();
+            productRepository.save(businessProduct);
 
-        memberRepository.save(m2); // 먼저 Member 저장 (연관 관계가 설정된 상태에서)
-
-        productRepository.save(p2); // Product 저장
-        productRepository.save(p4); // Product 저장
+        }
 
         em.flush();
         em.clear();
-        //멤버 전체 조회
-//        List<Member> members = memberRepository.findAll();
-        List<Product>products = productRepository.findAll();
 
-////		각 멤버가 가지고 있는 상품의 갯수 조회
-//        for (Product p : products) {
-//            for (int i = 0; i <; i++) {
-//                System.out.println(m.getProducts().get(i).getName());
-//            }
-////			System.out.println(m.getId()+" 번 member의 product size : "+m.getProducts().size());
-//        }
+        int iterations = 3;
+        long totalTime = 0;
 
-//		List<Product> products = productRepository.findAllWithMember();
-//		for(Product p : products){
-//			p.getMember().getName();
-//		}
-    }
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        for (int i = 0; i < iterations; i++) {
+            long startTime = System.nanoTime();
+//            List<Product> products = productRepository.findByCategoryPath(laptopCategory.getPath());
+            Page<ProductResponse> products = productService.getProductsByCategoryIncludingChildren(laptopCategory.getId(),pageRequest);
+//            System.out.println("토탈 엘리먼트 "+products.getTotalElements());
+//            System.out.println(products.toList().get(0).getName());
+            long endTime = System.nanoTime();
+            long executionTime = (endTime - startTime) / 1_000_000;
+            totalTime += executionTime;
 
-//    @Test
-//    @Transactional
-//    void 카테고리확인() {
-//        System.out.println("start");
-//        Category a1 = new Category();
-//        a1.setName("컴퓨터 및 노트북");
-//        a1.setParent(null);
-//        categoryRepository.save(a1);
-//
-//        Category b1 = new Category();
-//        b1.setName("테블릿 및 모바일");
-//        b1.setParent(null);
-//        categoryRepository.save(b1);
-//////////////////////////////////////////////
-//
-//        Category notebook = new Category();
-//        notebook.setName("노트북");
-//        notebook.setParent(a1.getId());
-//        categoryRepository.save(notebook);
-//
-//        Category monitor = new Category();
-//        monitor.setName("모니터");
-//        monitor.setParent(a1.getId());
-//        categoryRepository.save(monitor);
-///////////////////////////////////////////
-//        Category bpc = new Category();
-//        bpc.setName("브랜트 컴퓨터");
-//        bpc.setParent(notebook.getId());
-//        categoryRepository.save(bpc);
-//
-//        Category gamingnotebook = new Category();
-//        gamingnotebook.setName("게이밍 노트북");
-//        gamingnotebook.setParent(notebook.getId());
-//        categoryRepository.save(gamingnotebook);
-/////////////////////////////////////////////////////
-//        Category samsungmonitor = new Category();
-//        samsungmonitor.setName("삼성모니터");
-//        samsungmonitor.setParent(monitor.getId());
-//        categoryRepository.save(samsungmonitor);
-//
-//        Category applemonitor = new Category();
-//        applemonitor.setName("애플모니터");
-//        applemonitor.setParent(monitor.getId());
-//        categoryRepository.save(applemonitor);
-//
-//        em.flush();
-//        em.clear();
-//
-//        List<Category> ca =   categoryRepository.findByParentIsNull();
-//        for(Category c : ca){
-//            System.out.println("상위 카테 "  + c.getName());
-//            List<Category> low = categoryRepository.findByParentId(c.getId());
-//            for(Category cc : low){
-//                System.out.println(" 하위 카테 " +cc.getName());
-//            }
-//        }
-//
-//        System.out.println();
-//
-//    }
-//
-//    @Test
-//    @Transactional
-//    void 상품_확인() {
-//        System.out.println("start");
-//        Laptop a = new Laptop();
-//        a.setMonitorSize(14.7);
-//        a.setName("쉠성 노트북");
-//        productRepository.save(a);
-//
-//        Laptop b = new Laptop();
-//        b.setMonitorSize(11.7);
-//        b.setName("macBook");
-//        productRepository.save(b);
-//
-//        Laptop c = new Laptop();
-//        c.setMonitorSize(15.7);
-//        c.setName("VivoBook");
-//        productRepository.save(c);
-//
-//        em.flush();
-//        em.clear();
-//
-//        productRepository.findLaptops().forEach(laptop -> System.out.println(laptop.getName()));
-//    }
+            System.out.println("실행 " + (i + 1) + ": " + executionTime + "ms");
+            em.flush();
+            em.clear();
+        }
+
+        double averageTime = (double) totalTime / iterations;
+        System.out.println("평균 실행 시간: " + averageTime + "ms");
+
+
+     }
 }
 
 
