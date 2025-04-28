@@ -1,5 +1,6 @@
 package com.example.CompProductSystem.api.Product;
 
+import com.example.CompProductSystem.api.Product.Search.dto.ProductSearchCondition;
 import com.example.CompProductSystem.common.dto.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -70,11 +71,28 @@ public class ProductController {
     @GetMapping("/category/{categoryId}/including-children")
     public ResponseEntity<Result> getProductsByCategoryIncludingChildren(
         @PathVariable("categoryId") Long categoryId,
-        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+        @PageableDefault(size = 10, sort = "lowestPrice", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
                         .data(productService.getProductsByCategoryIncludingChildren(categoryId, pageable))
+                        .build());
+    }  
+
+    /**
+     * @apiNote 특정 조건에 맞는 상품을 검색하여 조회
+     * @param condition 검색 조건
+     * @param pageable 페이지 및 정렬 정보
+     * @return 검색 조건에 맞는 상품 목록을 페이징하여 반환
+     */
+    @PostMapping("/search")
+    public ResponseEntity<Result> searchProducts(
+        @RequestBody ProductSearchCondition condition,
+        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data(productService.searchProducts(condition, pageable))
                         .build());
     }
 }

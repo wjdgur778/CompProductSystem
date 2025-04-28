@@ -2,31 +2,23 @@ package com.example.CompProductSystem;
 
 import com.example.CompProductSystem.api.Category.Category;
 import com.example.CompProductSystem.api.Category.CategoryRepository;
-import com.example.CompProductSystem.api.Member.Member;
 import com.example.CompProductSystem.api.Member.MemberRepository;
 import com.example.CompProductSystem.api.Member.MemberService;
-import com.example.CompProductSystem.api.Product.Product;
-import com.example.CompProductSystem.api.Product.ProductRepository;
+import com.example.CompProductSystem.api.Product.Repository.ProductRepository;
 import com.example.CompProductSystem.api.Product.ProductService;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Laptop;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Furniture;
+import com.example.CompProductSystem.api.Product.Repository.ProductSearchRepo;
+import com.example.CompProductSystem.api.Product.Search.dto.ProductSearchCondition;
 import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
 
 
 @SpringBootTest
@@ -45,6 +37,7 @@ class CompProductSystemApplicationTests {
     CategoryRepository categoryRepository;
 
     @Autowired
+    ProductSearchRepo productSearchRepo;
 //    TestDataInitializer initData;
 
     @PersistenceContext
@@ -83,7 +76,7 @@ class CompProductSystemApplicationTests {
             Laptop gamingProduct = Laptop.builder()
                 .name("Gaming Laptop " + i)
                 .category(gamingLaptopCategory)
-                .monitorSize(15.6)
+                .inch(14.1+(i*0.2))
                 .build();
             productRepository.save(gamingProduct);
 
@@ -96,7 +89,7 @@ class CompProductSystemApplicationTests {
             Laptop businessProduct = Laptop.builder()
                 .name("Business Laptop " + i)
                 .category(businessLaptopCategory)
-                .monitorSize(14.0)
+                .inch(14.1+(i*0.2))
                 .build();
             productRepository.save(businessProduct);
 
@@ -108,17 +101,20 @@ class CompProductSystemApplicationTests {
         int iterations = 3;
         long totalTime = 0;
 
-        PageRequest pageRequest = PageRequest.of(0, 20);
+        PageRequest pageRequest = PageRequest.of(0, 50);
+        ProductSearchCondition productSearchCondition = new ProductSearchCondition("LAPTOP","GREEN",14.0,40.0);
         for (int i = 0; i < iterations; i++) {
             long startTime = System.nanoTime();
 //            List<Product> products = productRepository.findByCategoryPath(laptopCategory.getPath());
-            Page<ProductResponse> products = productService.getProductsByCategoryIncludingChildren(laptopCategory.getId(),pageRequest);
-//            System.out.println("토탈 엘리먼트 "+products.getTotalElements());
-//            System.out.println(products.toList().get(0).getName());
+//            Page<ProductResponse> products = productService.getProductsByCategoryIncludingChildren(laptopCategory.getId(),pageRequest);
+            Page<ProductResponse> products = productSearchRepo.searchProducts(productSearchCondition,pageRequest);
             long endTime = System.nanoTime();
             long executionTime = (endTime - startTime) / 1_000_000;
             totalTime += executionTime;
-
+            for (ProductResponse p: products) {
+                System.out.print(p.getName()+" ");
+            }
+            System.out.println();
             System.out.println("실행 " + (i + 1) + ": " + executionTime + "ms");
             em.flush();
             em.clear();
@@ -126,7 +122,6 @@ class CompProductSystemApplicationTests {
 
         double averageTime = (double) totalTime / iterations;
         System.out.println("평균 실행 시간: " + averageTime + "ms");
-
 
      }
 }

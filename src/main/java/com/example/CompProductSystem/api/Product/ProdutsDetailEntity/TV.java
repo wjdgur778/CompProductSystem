@@ -17,11 +17,11 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 @DiscriminatorValue("TV")
 public class TV extends Product {
-    Double inches;
+    Double inch;
 
     @Builder
-    public TV(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, Double inches ) {
+    public TV(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, Double inch ) {
         super(name, releaseDate, imageUrl, member, category);
-        this.inches = inches;
+        this.inch = inch;
     }
 }

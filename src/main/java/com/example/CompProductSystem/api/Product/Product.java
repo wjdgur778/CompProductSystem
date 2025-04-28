@@ -16,9 +16,9 @@ import java.util.List;
  * todo. Product / class -> interface
  * todo. figure out. how compose these entities
  */
-//@Table(indexes = {
-//        @Index(name = "idx_path",columnList = "categoryPath")
-//})
+@Table(indexes = {
+        @Index(name = "idx_path",columnList = "categoryPath")
+})
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 외부에서는 기본 생성자를 못쓰게 하되, JPA는 접근 가능하게
@@ -47,6 +47,7 @@ public abstract class Product {
      */
     @Column(name = "category_path")
     private String categoryPath;
+
 
     /*
         todo

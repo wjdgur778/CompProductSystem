@@ -16,18 +16,18 @@ import java.time.LocalTime;
 @AllArgsConstructor  // Builder를 위한 모든 필드 생성자
 @DiscriminatorValue("Laptop")
 public class Laptop extends Product {
-    private Double monitorSize;
+    private Double inch;
 //    private String manufacture; todo embedded를 통한 제조사 구별을 해야할지, 데이터 설계에 대한 고민이 필요하다.
 
-    public void setMonitorSize(double monitorSize){
-        this.monitorSize = monitorSize;
+    public void setInch(double inch){
+        this.inch = inch;
     }
 
     // 부모 클래스의 필드도 포함한 생성자
     @Builder
-    public Laptop(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, Double monitorSize) {
+    public Laptop(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, Double inch) {
         super(name, releaseDate, imageUrl, member,category);
-        this.monitorSize = monitorSize;
+        this.inch = inch;
     }
 
 }

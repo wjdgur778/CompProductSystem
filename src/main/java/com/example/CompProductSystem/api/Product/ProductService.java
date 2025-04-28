@@ -2,19 +2,21 @@ package com.example.CompProductSystem.api.Product;
 
 import com.example.CompProductSystem.api.Category.Category;
 import com.example.CompProductSystem.api.Category.CategoryRepository;
+import com.example.CompProductSystem.api.Product.Repository.ProductRepository;
+import com.example.CompProductSystem.api.Product.Repository.ProductSearchRepo;
+import com.example.CompProductSystem.api.Product.Search.dto.ProductSearchCondition;
 import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductSearchRepo productSearchRepo;
 
     /**
      * 특정 카테고리에 속한 상품들을 페이징하여 조회하는 메서드
@@ -47,6 +49,15 @@ public class ProductService {
         ).map(ProductResponse::from);
     }
 
-
+/**
+ * 검색 조건에 맞는 상품을 검색하여 조회    
+ * @param condition 검색 조건
+ * @param pageable 페이지 정보
+ * @return 검색 조건에 맞는 상품 목록을 페이징하여 ProductResponse DTO로 변환한 결과
+ */
+    public Page<ProductResponse> searchProducts(ProductSearchCondition condition, Pageable pageable) {
+        
+        return productSearchRepo.searchProducts(condition, pageable);
+    }
 
 }

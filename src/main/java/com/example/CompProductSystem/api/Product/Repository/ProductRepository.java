@@ -1,5 +1,6 @@
-package com.example.CompProductSystem.api.Product;
+package com.example.CompProductSystem.api.Product.Repository;
 
+import com.example.CompProductSystem.api.Product.Product;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Laptop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,5 +27,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
      */
     @Query("select p from Product p where p.categoryPath like :path%")
     Page<Product> findByCategoryPath(@Param("path") String path, Pageable pageable);
+
+
 
 }
