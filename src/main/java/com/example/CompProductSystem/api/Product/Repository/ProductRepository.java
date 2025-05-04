@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
     @Query("select p from Product p join fetch p.member")
@@ -27,6 +28,10 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
      */
     @Query("select p from Product p where p.categoryPath like :path%")
     Page<Product> findByCategoryPath(@Param("path") String path, Pageable pageable);
+
+    // 가격순 정렬
+    @Query("select p from Product p where p.categoryPath like :path% order by p.lowestPrice asc")
+    Page<Product> findByCategoryPathOrderByPrice(@Param("path") String path, Pageable pageable);
 
 
 

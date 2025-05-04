@@ -40,9 +40,10 @@ public class ProductService {
      * @throws IllegalArgumentException 카테고리 ID가 존재하지 않는 경우
      */
     public Page<ProductResponse> getProductsByCategoryIncludingChildren(Long categoryId, Pageable pageable) {
+        //1. category 조회
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-
+        //2. 해당 카테고리와 하위 카테고리의 모든 상품 조회
         return productRepository.findByCategoryPath(
                 category.getPath(),
                 pageable
@@ -60,4 +61,8 @@ public class ProductService {
         return productSearchRepo.searchProducts(condition, pageable);
     }
 
+
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }   
 }

@@ -5,6 +5,7 @@ import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.*;
 import com.example.CompProductSystem.api.Product.Search.dto.ProductSearchCondition;
 import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,8 @@ public class ProductSearchRepo {
 
     /**
      * condition에 조건에 필요한 파라미터들을 만들어 조건에 맞는 상품들을 조회한다.
-     *
+     * 카테고리 타입에 따라 조회하는 메서드를 분기처리한다.     
+     * 카테고리 타입은 대문자로 저장되어 있기 때문에 비교할때는 대소문자 구분없이 비교한다.
      */
     public Page<ProductResponse> searchProducts(ProductSearchCondition condition, Pageable pageable) {
         if ("FURNITURE".equalsIgnoreCase(condition.getCategoryType())) {
@@ -39,16 +41,14 @@ public class ProductSearchRepo {
     }
 
     /**
-     * @param condition
-     * @param pageable
-     * @return
+     * 
      */
     private Page<ProductResponse> searchFurniture(ProductSearchCondition condition, Pageable pageable) {
         QFurniture furniture = QFurniture.furniture;
 
         List<ProductResponse> contents = queryFactory
                 .selectFrom(furniture)
-                .where(colorEq(condition.getColor()))
+                .where(colorEq(condition))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch()
@@ -59,7 +59,7 @@ public class ProductSearchRepo {
         Long total = queryFactory
                 .select(furniture.count())
                 .from(furniture)
-                .where(colorEq(condition.getColor()))
+                .where(colorEq(condition))
                 .fetchOne();
         return new PageImpl<>(contents, pageable, total == null ? 0 : total);
     }
@@ -74,7 +74,7 @@ public class ProductSearchRepo {
 
         List<ProductResponse> contents = queryFactory
                 .selectFrom(laptop)
-                .where(monitorSizeCondition(condition.getMonitorSize()))
+                .where(monitorSizeCondition(condition))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch()
@@ -85,7 +85,7 @@ public class ProductSearchRepo {
         Long total = queryFactory
                 .select(laptop.count())
                 .from(laptop)
-                .where(monitorSizeCondition(condition.getMonitorSize()))
+                .where(monitorSizeCondition(condition))
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, total);
@@ -96,7 +96,7 @@ public class ProductSearchRepo {
         QTV tv = QTV.tV;
         List<ProductResponse> contents = queryFactory
                 .selectFrom(tv)
-                .where(inchesCondition(condition.getInches()))
+                .where(inchesCondition(condition))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch()
@@ -107,24 +107,38 @@ public class ProductSearchRepo {
         Long total = queryFactory
                 .select(tv.count())
                 .from(tv)
-                .where(inchesCondition(condition.getInches()))
+                .where(inchesCondition(condition))
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, total);
     }
 
-
-    private BooleanExpression colorEq(String color) {
+   
+    /**
+     * 색상 조건에 맞는 상품을 조회하는 메서드
+     * @param condition 검색 조건
+     * @return 검색 조건에 맞는 상품 목록
+     */
+    private BooleanExpression colorEq(ProductSearchCondition condition) {
         QFurniture furniture = QFurniture.furniture;
+        String color = condition.getColor();
+        BooleanBuilder builder = new BooleanBuilder();
 
+        builder.and(furniture.categoryPath.like(condition.getCategoryPath() + "%"));
         return color != null ? furniture.color.eq(color) : null;
     }
 
-
-    private BooleanBuilder monitorSizeCondition(Double inch) {
+    /**
+     * 노트북 모니터 크기 조건에 맞는 상품을 조회하는 메서드
+     * @param condition 검색 조건
+     * @return 검색 조건에 맞는 상품 목록
+     */
+    private BooleanBuilder monitorSizeCondition(ProductSearchCondition condition) {
         QLaptop laptop = QLaptop.laptop;
+        Double inch = condition.getMonitorSize();
         BooleanBuilder builder = new BooleanBuilder();
 
+        builder.and(laptop.categoryPath.like(condition.getCategoryPath() + "%"));
         //14인치대
         if (inch >= 14d && inch < 15d)
             builder.and(laptop.inch.goe(14d)
@@ -143,10 +157,16 @@ public class ProductSearchRepo {
         return builder;
     }
 
-
-    private BooleanBuilder inchesCondition(Double inch) {
+    /**
+     * tv 모니터 크기 조건에 맞는 상품을 조회하는 메서드
+     * @param condition 검색 조건
+     * @return 검색 조건에 맞는 상품 목록
+     */
+    private BooleanBuilder inchesCondition(ProductSearchCondition condition) {
         QTV tv = QTV.tV;
         BooleanBuilder builder = new BooleanBuilder();
+        Double inch = condition.getInches();
+        builder.and(tv.categoryPath.like(condition.getCategoryPath() + "%"));
         //40인치대
         if (inch >= 40d && inch < 50d)
             builder.and(tv.inch.goe(14d)

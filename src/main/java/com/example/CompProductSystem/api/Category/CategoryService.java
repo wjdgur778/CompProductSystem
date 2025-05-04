@@ -84,8 +84,13 @@ public class CategoryService {
         }
     }
 
-    // 카테고리 관련 메서드만 남기고 상품 조회 로직은 ProductService로 이동
-
-
+    /**
+     * @apiNote 카테고리 삭제
+     * @param id 삭제할 카테고리 ID
+     */
+    @Transactional
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
+    }   
 
 }

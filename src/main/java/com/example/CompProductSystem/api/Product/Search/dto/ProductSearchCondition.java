@@ -9,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProductSearchCondition {
     private String categoryType; // "furniture", "laptop", "tv" 구분
+    private String categoryPath;
     private String color; // furniture용
     private Double monitorSize; // laptop용
     private Double inches; // tv용

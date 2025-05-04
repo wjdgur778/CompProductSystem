@@ -63,4 +63,13 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * @apiNote  카테고리 삭제
+     * @param id 삭제할 카테고리 ID
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

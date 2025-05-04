@@ -1,12 +1,10 @@
 package com.example.CompProductSystem.api.Product.dto.response;
 
-import com.example.CompProductSystem.api.Category.Category;
-import com.example.CompProductSystem.api.Member.Member;
 import com.example.CompProductSystem.api.PriceInfo.PriceInfo;
 import com.example.CompProductSystem.api.Product.Product;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Furniture;
+import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Laptop;
+import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.TV;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,18 +19,34 @@ import java.util.List;
 @Builder
 public class ProductResponse {
     private final String name;
-    private final String categoryPath;
     private LocalTime releaseDate;// 등록 월
     private String imageUrl; // s3를 활용한 이미지 링크 필드
-    private List<PriceInfo> priceInfo; //
+    private Long lowestPrice;
+    private Object details; // LaptopResponse, FurnitureResponse 등을 담기 위한 필드
 
     public static ProductResponse from(Product product) {
+        Object detail=null;
+
+        if (product instanceof Laptop laptop) {
+            detail = LaptopResponse.builder()
+                    .inch(laptop.getInch())
+                    .build();
+        } else if (product instanceof Furniture furniture) {
+            detail = FurnitureResponse.builder()
+                    .color(furniture.getColor())
+                    .build();
+        }
+        else if (product instanceof TV tv){
+            detail = TvResponse.builder()
+                    .inch(tv.getInch())
+                    .build();
+        }
         return ProductResponse.builder()
                 .name(product.getName())
-                .categoryPath(product.getCategory().getPath())
                 .imageUrl("")//todo 이미지 링크 넣어야해
-                .priceInfo(product.getPriceInfo())
+                .lowestPrice(product.getLowestPrice())
                 .releaseDate(product.getReleaseDate())
+                .details(detail)
                 .build();
     }
 }

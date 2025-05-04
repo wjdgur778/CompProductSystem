@@ -54,7 +54,7 @@ public class ProductController {
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Result> getProductsByCategory(
         @PathVariable("categoryId") Long categoryId,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
@@ -71,7 +71,7 @@ public class ProductController {
     @GetMapping("/category/{categoryId}/including-children")
     public ResponseEntity<Result> getProductsByCategoryIncludingChildren(
         @PathVariable("categoryId") Long categoryId,
-        @PageableDefault(size = 10, sort = "lowestPrice", direction = Sort.Direction.DESC) Pageable pageable
+        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
@@ -95,4 +95,20 @@ public class ProductController {
                         .data(productService.searchProducts(condition, pageable))
                         .build());
     }
+
+/**
+ * @apiNote 상품 삭제
+ * @param id 삭제할 상품 ID
+ */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Result> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data("상품이 성공적으로 삭제되었습니다.")
+                        .build()
+                );
+    }
+
+
 }

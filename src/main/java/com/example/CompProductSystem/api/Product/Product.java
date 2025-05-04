@@ -2,14 +2,11 @@ package com.example.CompProductSystem.api.Product;
 
 import com.example.CompProductSystem.api.Category.Category;
 import com.example.CompProductSystem.api.Member.Member;
-import com.example.CompProductSystem.api.PriceInfo.PriceInfo;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalTime;
-import java.util.List;
+
 
 /**
  * todo. make impl _entity
@@ -17,7 +14,7 @@ import java.util.List;
  * todo. figure out. how compose these entities
  */
 @Table(indexes = {
-        @Index(name = "idx_path",columnList = "categoryPath")
+        @Index(name = "idx_path", columnList = "categoryPath")
 })
 @Entity
 @Getter
@@ -36,7 +33,8 @@ public abstract class Product {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;// 멤버와의 manytoone 관계
 
-    private Long lowestPrice; // 정렬과 조회를 위한 최저가격 필드
+    private Long lowestPrice; // 정렬을 위한 최저가격 필드
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_ID")
@@ -48,25 +46,23 @@ public abstract class Product {
     @Column(name = "category_path")
     private String categoryPath;
 
+//    /**
+//     * cascade = CascadeType.ALL : Product삭제할 때 priceInfo도 함께 영속성 처리
+//     */
+//    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+//    private List<PriceInfo> priceInfo; //
 
-    /*
-        todo
-         OneToMany 관계를 맺을지 관계를 맺지 않고 prodcut 조회 후에 요청을 한번 더 받을지를 고민했다.
-         페이징 처리를 통해 한정된 응답을 보내줄 것이며, 한번에 보여져야하는 요구사항에 맞춰 관계를 맺기로 했다.
+
+    /**
+     * 생성자 파트
      */
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_ID")
-    @BatchSize(size = 5) // 배치사이즈 고려할 필요가 있다.
-    private List<PriceInfo> priceInfo; //
-
-
-    protected Product(String name, LocalTime releaseDate, String imageUrl, Member member,Category category) {
+    protected Product(String name, LocalTime releaseDate, String imageUrl, Member member, Category category) {
         this.name = name;
         this.releaseDate = releaseDate;
         this.imageUrl = imageUrl;
         this.member = member;
         this.category = category;
-        this.categoryPath = getCategoryPath();
+        this.categoryPath = category.getPath();
     }
 
     /**
@@ -74,6 +70,7 @@ public abstract class Product {
      * private 설정을 해주는 것이 좋다.
      * validation을 거치는 메쏘드에서 private setMember를 부르는 식으로 짜면
      * 좋을듯.
+     *
      * @param member
      */
 
@@ -87,7 +84,13 @@ public abstract class Product {
         }
     }
 
-    protected void changeCategory(Category category) {
+    public void changeCategory(Category category) {
         this.category = category;
     }
+
+    public void setLowestPrice(Long lowestPrice) {
+        this.lowestPrice = lowestPrice;
+    }
+
+
 }

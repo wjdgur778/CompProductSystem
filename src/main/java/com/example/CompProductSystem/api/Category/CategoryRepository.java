@@ -31,4 +31,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query("select p from Product p where p.category.id = :categoryId")
     List<Product> findProductsByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Query("delete from Category c where c.id = :id")
+    void deleteById(@Param("id") Long id);
 }

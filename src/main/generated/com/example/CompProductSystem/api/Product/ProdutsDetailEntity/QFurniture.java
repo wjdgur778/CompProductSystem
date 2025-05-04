@@ -48,9 +48,6 @@ public class QFurniture extends EntityPathBase<Furniture> {
     public final StringPath name;
 
     //inherited
-    public final ListPath<com.example.CompProductSystem.api.PriceInfo.PriceInfo, com.example.CompProductSystem.api.PriceInfo.QPriceInfo> priceInfo;
-
-    //inherited
     public final TimePath<java.time.LocalTime> releaseDate;
 
     public QFurniture(String variable) {
@@ -79,7 +76,6 @@ public class QFurniture extends EntityPathBase<Furniture> {
         this.lowestPrice = _super.lowestPrice;
         this.member = _super.member;
         this.name = _super.name;
-        this.priceInfo = _super.priceInfo;
         this.releaseDate = _super.releaseDate;
     }
 

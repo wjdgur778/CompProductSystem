@@ -36,8 +36,6 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath name = createString("name");
 
-    public final ListPath<com.example.CompProductSystem.api.PriceInfo.PriceInfo, com.example.CompProductSystem.api.PriceInfo.QPriceInfo> priceInfo = this.<com.example.CompProductSystem.api.PriceInfo.PriceInfo, com.example.CompProductSystem.api.PriceInfo.QPriceInfo>createList("priceInfo", com.example.CompProductSystem.api.PriceInfo.PriceInfo.class, com.example.CompProductSystem.api.PriceInfo.QPriceInfo.class, PathInits.DIRECT2);
-
     public final TimePath<java.time.LocalTime> releaseDate = createTime("releaseDate", java.time.LocalTime.class);
 
     public QProduct(String variable) {
