@@ -20,8 +20,8 @@ public class Furniture extends Product {
     String color;
 
     @Builder
-    public Furniture(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, String color) {
-        super(name, releaseDate, imageUrl, member, category);
+    public Furniture(String name,  String imageUrl, Member member, Category category, String color) {
+        super(name, imageUrl, member, category);
         this.color = color;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.CompProductSystem.api.Category;
 
+import com.example.CompProductSystem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

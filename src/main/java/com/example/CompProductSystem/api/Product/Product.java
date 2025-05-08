@@ -2,6 +2,7 @@ package com.example.CompProductSystem.api.Product;
 
 import com.example.CompProductSystem.api.Category.Category;
 import com.example.CompProductSystem.api.Member.Member;
+import com.example.CompProductSystem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,12 +22,11 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 외부에서는 기본 생성자를 못쓰게 하되, JPA는 접근 가능하게
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) //단일 테이블 전략을 위한 어노테이션. 구체 상품 조회시에 조인이 필요없다.
 @DiscriminatorColumn(name = "DTYPE") //DTYPE을 통해 product에 속한 item들을 구분한다.
-public abstract class Product {
+public abstract class Product extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;// id
     private String name;// 상품 이름
-    private LocalTime releaseDate;// 등록 월
     private String imageUrl; // s3를 활용한 이미지 링크 필드
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,19 +46,11 @@ public abstract class Product {
     @Column(name = "category_path")
     private String categoryPath;
 
-//    /**
-//     * cascade = CascadeType.ALL : Product삭제할 때 priceInfo도 함께 영속성 처리
-//     */
-//    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-//    private List<PriceInfo> priceInfo; //
-
-
     /**
      * 생성자 파트
      */
-    protected Product(String name, LocalTime releaseDate, String imageUrl, Member member, Category category) {
+    protected Product(String name, String imageUrl, Member member, Category category) {
         this.name = name;
-        this.releaseDate = releaseDate;
         this.imageUrl = imageUrl;
         this.member = member;
         this.category = category;

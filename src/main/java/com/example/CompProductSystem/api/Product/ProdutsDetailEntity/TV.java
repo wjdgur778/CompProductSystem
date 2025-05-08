@@ -20,8 +20,8 @@ public class TV extends Product {
     Double inch;
 
     @Builder
-    public TV(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, Double inch ) {
-        super(name, releaseDate, imageUrl, member, category);
+    public TV(String name, String imageUrl, Member member, Category category, Double inch ) {
+        super(name, imageUrl, member, category);
         this.inch = inch;
     }
 }

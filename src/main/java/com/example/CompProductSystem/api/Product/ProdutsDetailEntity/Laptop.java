@@ -25,8 +25,8 @@ public class Laptop extends Product {
 
     // 부모 클래스의 필드도 포함한 생성자
     @Builder
-    public Laptop(String name, LocalTime releaseDate, String imageUrl, Member member, Category category, Double inch) {
-        super(name, releaseDate, imageUrl, member,category);
+    public Laptop(String name, String imageUrl, Member member, Category category, Double inch) {
+        super(name, imageUrl, member,category);
         this.inch = inch;
     }
 

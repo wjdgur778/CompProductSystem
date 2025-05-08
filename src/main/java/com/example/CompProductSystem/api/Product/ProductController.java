@@ -1,6 +1,9 @@
 package com.example.CompProductSystem.api.Product;
 
 import com.example.CompProductSystem.api.Product.Search.dto.ProductSearchCondition;
+import com.example.CompProductSystem.api.Product.dto.request.FurnitureRequest;
+import com.example.CompProductSystem.api.Product.dto.request.LaptopRequest;
+import com.example.CompProductSystem.api.Product.dto.request.TvRequest;
 import com.example.CompProductSystem.common.dto.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -53,8 +56,8 @@ public class ProductController {
      */
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Result> getProductsByCategory(
-        @PathVariable("categoryId") Long categoryId,
-        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PathVariable("categoryId") Long categoryId,
+            @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
@@ -70,14 +73,14 @@ public class ProductController {
      */
     @GetMapping("/category/{categoryId}/including-children")
     public ResponseEntity<Result> getProductsByCategoryIncludingChildren(
-        @PathVariable("categoryId") Long categoryId,
-        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PathVariable("categoryId") Long categoryId,
+            @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
                         .data(productService.getProductsByCategoryIncludingChildren(categoryId, pageable))
                         .build());
-    }  
+    }
 
     /**
      * @apiNote 특정 조건에 맞는 상품을 검색하여 조회
@@ -87,19 +90,58 @@ public class ProductController {
      */
     @PostMapping("/search")
     public ResponseEntity<Result> searchProducts(
-        @RequestBody ProductSearchCondition condition,
-        @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+            @RequestBody ProductSearchCondition condition,
+            @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
                         .data(productService.searchProducts(condition, pageable))
                         .build());
     }
+    // 생성을 위해서는 type이 필요
+    /**
+     * @apiNote 노트북 상품 생성
+     * @param productRequest 노트북 상품 정보
+     * @return 생성된 노트북 상품 정보
+     */
+    @PostMapping("/create/laptop")
+    public ResponseEntity<Result> createLaptop(@RequestBody LaptopRequest laptopRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data(productService.createLaptop(laptopRequest))
+                        .build());
+    }
 
-/**
- * @apiNote 상품 삭제
- * @param id 삭제할 상품 ID
- */
+    /**
+     * @apiNote 텔레비전 상품 생성
+     * @param productRequest 텔레비전 상품 정보
+     * @return 생성된 텔레비전 상품 정보
+     */
+    @PostMapping("/create/tv")
+    public ResponseEntity<Result> createTV(@RequestBody TvRequest tvRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data(productService.createTV(tvRequest))
+                        .build());
+    }
+
+    /**
+     * @apiNote 가구 상품 생성
+     * @param productRequest 가구 상품 정보
+     * @return 생성된 가구 상품 정보
+     */
+    @PostMapping("/create/furniture")
+    public ResponseEntity<Result> createFurniture(@RequestBody FurnitureRequest furnitureRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data(productService.createFurniture(furnitureRequest))
+                        .build());
+    }
+
+    /**
+     * @apiNote 상품 삭제
+     * @param id 삭제할 상품 ID
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Result> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
@@ -109,6 +151,5 @@ public class ProductController {
                         .build()
                 );
     }
-
 
 }

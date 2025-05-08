@@ -45,7 +45,6 @@ public class ProductResponse {
                 .name(product.getName())
                 .imageUrl("")//todo 이미지 링크 넣어야해
                 .lowestPrice(product.getLowestPrice())
-                .releaseDate(product.getReleaseDate())
                 .details(detail)
                 .build();
     }

@@ -144,7 +144,6 @@ class CompProductSystemApplicationTests {
                     .linkUrl("https://test.com/office-chair-" + i)
                     .build());
 
-
         }
 
         em.flush();

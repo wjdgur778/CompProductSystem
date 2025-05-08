@@ -11,11 +11,13 @@ import java.util.stream.Collectors;
 @Builder
 public class CategoryResponse {
     private final String name;
+    private Long categoryId;
     private final List<CategoryResponse> children;
 
     public static CategoryResponse of(Category category) {
         return CategoryResponse.builder()
             .name(category.getName())
+            .categoryId(category.getId())
             .children(null)
             .build();
     }

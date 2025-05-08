@@ -48,7 +48,10 @@ public class QLaptop extends EntityPathBase<Laptop> {
     public final StringPath name;
 
     //inherited
-    public final TimePath<java.time.LocalTime> releaseDate;
+    public final DateTimePath<java.time.LocalDateTime> releaseTime;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updateTime;
 
     public QLaptop(String variable) {
         this(Laptop.class, forVariable(variable), INITS);
@@ -76,7 +79,8 @@ public class QLaptop extends EntityPathBase<Laptop> {
         this.lowestPrice = _super.lowestPrice;
         this.member = _super.member;
         this.name = _super.name;
-        this.releaseDate = _super.releaseDate;
+        this.releaseTime = _super.releaseTime;
+        this.updateTime = _super.updateTime;
     }
 
 }

@@ -48,7 +48,10 @@ public class QTV extends EntityPathBase<TV> {
     public final StringPath name;
 
     //inherited
-    public final TimePath<java.time.LocalTime> releaseDate;
+    public final DateTimePath<java.time.LocalDateTime> releaseTime;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updateTime;
 
     public QTV(String variable) {
         this(TV.class, forVariable(variable), INITS);
@@ -76,7 +79,8 @@ public class QTV extends EntityPathBase<TV> {
         this.lowestPrice = _super.lowestPrice;
         this.member = _super.member;
         this.name = _super.name;
-        this.releaseDate = _super.releaseDate;
+        this.releaseTime = _super.releaseTime;
+        this.updateTime = _super.updateTime;
     }
 
 }

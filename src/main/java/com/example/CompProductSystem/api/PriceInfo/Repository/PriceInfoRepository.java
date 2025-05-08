@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface PriceInfoRepository extends JpaRepository<PriceInfo, Long> {
     @Query("select min(pi.price) from PriceInfo pi where pi.product.id= :productId ")
     Long findLowestPriceWithProductId(@Param("productId") Long ProductId);
+
+    @Query("select pi from PriceInfo pi where pi.product.id= :productId order By pi.price asc")
+    List<PriceInfo> findAllByProductIdOrderByPriceAsc(@Param("productId") Long ProductId);
 }

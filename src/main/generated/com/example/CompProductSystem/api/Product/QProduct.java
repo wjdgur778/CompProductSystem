@@ -22,6 +22,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public static final QProduct product = new QProduct("product");
 
+    public final com.example.CompProductSystem.common.QBaseTimeEntity _super = new com.example.CompProductSystem.common.QBaseTimeEntity(this);
+
     public final com.example.CompProductSystem.api.Category.QCategory category;
 
     public final StringPath categoryPath = createString("categoryPath");
@@ -36,7 +38,11 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath name = createString("name");
 
-    public final TimePath<java.time.LocalTime> releaseDate = createTime("releaseDate", java.time.LocalTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> releaseTime = _super.releaseTime;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
     public QProduct(String variable) {
         this(Product.class, forVariable(variable), INITS);
