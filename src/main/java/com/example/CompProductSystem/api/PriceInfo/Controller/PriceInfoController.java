@@ -6,10 +6,7 @@ import com.example.CompProductSystem.common.dto.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,4 +41,19 @@ public class PriceInfoController {
                         .build()
                 );
     }
+
+    /**
+     * @apiNote 가격 삭제
+     * @param id 삭제할 가격 ID
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Result> deleteProduct(@PathVariable Long id) {
+        priceInfoService.deletePriceInfo(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data(null)
+                        .build()
+                );
+    }
+
 }

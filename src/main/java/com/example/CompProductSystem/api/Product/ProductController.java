@@ -57,7 +57,7 @@ public class ProductController {
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Result> getProductsByCategory(
             @PathVariable("categoryId") Long categoryId,
-            @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "releaseTime", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
@@ -74,7 +74,7 @@ public class ProductController {
     @GetMapping("/category/{categoryId}/including-children")
     public ResponseEntity<Result> getProductsByCategoryIncludingChildren(
             @PathVariable("categoryId") Long categoryId,
-            @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "releaseTime", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
@@ -91,13 +91,25 @@ public class ProductController {
     @PostMapping("/search")
     public ResponseEntity<Result> searchProducts(
             @RequestBody ProductSearchCondition condition,
-            @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable
+//            @PageableDefault(size = 10, sort = "releaseTime", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "lowestPrice", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Result.builder()
                         .data(productService.searchProducts(condition, pageable))
                         .build());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Result> getProductById(@PathVariable(name = "id") Long id) {
+        System.out.println(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Result.builder()
+                        .data(productService.getProductById(id))
+                        .build());
+    }
+
+    
     // 생성을 위해서는 type이 필요
     /**
      * @apiNote 노트북 상품 생성

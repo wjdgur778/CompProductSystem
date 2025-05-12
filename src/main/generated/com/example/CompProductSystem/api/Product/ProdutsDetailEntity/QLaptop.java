@@ -36,7 +36,7 @@ public class QLaptop extends EntityPathBase<Laptop> {
     //inherited
     public final StringPath imageUrl;
 
-    public final NumberPath<Double> inch = createNumber("inch", Double.class);
+    public final NumberPath<Double> LMonitorSize = createNumber("LMonitorSize", Double.class);
 
     //inherited
     public final NumberPath<Long> lowestPrice;
@@ -52,6 +52,9 @@ public class QLaptop extends EntityPathBase<Laptop> {
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateTime;
+
+    //inherited
+    public final NumberPath<Long> viewCount;
 
     public QLaptop(String variable) {
         this(Laptop.class, forVariable(variable), INITS);
@@ -81,6 +84,7 @@ public class QLaptop extends EntityPathBase<Laptop> {
         this.name = _super.name;
         this.releaseTime = _super.releaseTime;
         this.updateTime = _super.updateTime;
+        this.viewCount = _super.viewCount;
     }
 
 }

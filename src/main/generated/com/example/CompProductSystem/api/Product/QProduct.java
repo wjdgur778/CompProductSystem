@@ -44,6 +44,8 @@ public class QProduct extends EntityPathBase<Product> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
+    public final NumberPath<Long> viewCount = createNumber("viewCount", Long.class);
+
     public QProduct(String variable) {
         this(Product.class, forVariable(variable), INITS);
     }

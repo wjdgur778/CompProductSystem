@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
-@DiscriminatorValue("Furniture")
+@DiscriminatorValue("furniture")
 public class Furniture extends Product {
     String color;
 

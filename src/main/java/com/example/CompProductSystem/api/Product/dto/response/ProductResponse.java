@@ -8,6 +8,7 @@ import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.TV;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -18,8 +19,9 @@ import java.util.List;
 @Getter
 @Builder
 public class ProductResponse {
+    private final Long id;
     private final String name;
-    private LocalTime releaseDate;// 등록 월
+    private LocalDateTime releaseDate;// 등록 월
     private String imageUrl; // s3를 활용한 이미지 링크 필드
     private Long lowestPrice;
     private Object details; // LaptopResponse, FurnitureResponse 등을 담기 위한 필드
@@ -29,7 +31,7 @@ public class ProductResponse {
 
         if (product instanceof Laptop laptop) {
             detail = LaptopResponse.builder()
-                    .inch(laptop.getInch())
+                    .inch(laptop.getLMonitorSize())
                     .build();
         } else if (product instanceof Furniture furniture) {
             detail = FurnitureResponse.builder()
@@ -38,11 +40,13 @@ public class ProductResponse {
         }
         else if (product instanceof TV tv){
             detail = TvResponse.builder()
-                    .inch(tv.getInch())
+                    .inch(tv.getTMonitorSize())
                     .build();
         }
         return ProductResponse.builder()
+                .id(product.getId())
                 .name(product.getName())
+                .releaseDate(product.getReleaseTime())
                 .imageUrl("")//todo 이미지 링크 넣어야해
                 .lowestPrice(product.getLowestPrice())
                 .details(detail)

@@ -36,8 +36,6 @@ public class QTV extends EntityPathBase<TV> {
     //inherited
     public final StringPath imageUrl;
 
-    public final NumberPath<Double> inch = createNumber("inch", Double.class);
-
     //inherited
     public final NumberPath<Long> lowestPrice;
 
@@ -50,8 +48,13 @@ public class QTV extends EntityPathBase<TV> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> releaseTime;
 
+    public final NumberPath<Double> TMonitorSize = createNumber("TMonitorSize", Double.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateTime;
+
+    //inherited
+    public final NumberPath<Long> viewCount;
 
     public QTV(String variable) {
         this(TV.class, forVariable(variable), INITS);
@@ -81,6 +84,7 @@ public class QTV extends EntityPathBase<TV> {
         this.name = _super.name;
         this.releaseTime = _super.releaseTime;
         this.updateTime = _super.updateTime;
+        this.viewCount = _super.viewCount;
     }
 
 }

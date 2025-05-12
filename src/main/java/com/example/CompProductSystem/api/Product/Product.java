@@ -34,7 +34,7 @@ public abstract class Product extends BaseTimeEntity {
     private Member member;// 멤버와의 manytoone 관계
 
     private Long lowestPrice; // 정렬을 위한 최저가격 필드
-
+    private Long viewCount; // 조회수
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_ID")

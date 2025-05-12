@@ -15,13 +15,13 @@ import java.time.LocalTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
-@DiscriminatorValue("TV")
+@DiscriminatorValue("tv")
 public class TV extends Product {
-    Double inch;
+    Double TMonitorSize;
 
     @Builder
-    public TV(String name, String imageUrl, Member member, Category category, Double inch ) {
+    public TV(String name, String imageUrl, Member member, Category category, Double TMonitorSize ) {
         super(name, imageUrl, member, category);
-        this.inch = inch;
+        this.TMonitorSize = TMonitorSize;
     }
 }

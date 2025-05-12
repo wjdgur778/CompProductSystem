@@ -53,6 +53,9 @@ public class QFurniture extends EntityPathBase<Furniture> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updateTime;
 
+    //inherited
+    public final NumberPath<Long> viewCount;
+
     public QFurniture(String variable) {
         this(Furniture.class, forVariable(variable), INITS);
     }
@@ -81,6 +84,7 @@ public class QFurniture extends EntityPathBase<Furniture> {
         this.name = _super.name;
         this.releaseTime = _super.releaseTime;
         this.updateTime = _super.updateTime;
+        this.viewCount = _super.viewCount;
     }
 
 }

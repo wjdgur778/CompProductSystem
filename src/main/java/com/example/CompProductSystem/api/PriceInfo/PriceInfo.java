@@ -4,6 +4,7 @@ import com.example.CompProductSystem.api.PriceInfo.dto.request.PriceInfoRequest;
 import com.example.CompProductSystem.api.Product.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 
