@@ -25,6 +25,7 @@ public class ProductResponse {
     private String imageUrl; // s3를 활용한 이미지 링크 필드
     private Long lowestPrice;
     private Object details; // LaptopResponse, FurnitureResponse 등을 담기 위한 필드
+    private Long viewCount;
 
     public static ProductResponse from(Product product) {
         Object detail=null;
@@ -47,6 +48,7 @@ public class ProductResponse {
                 .id(product.getId())
                 .name(product.getName())
                 .releaseDate(product.getReleaseTime())
+                .viewCount(product.getViewCount())
                 .imageUrl("")//todo 이미지 링크 넣어야해
                 .lowestPrice(product.getLowestPrice())
                 .details(detail)

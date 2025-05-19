@@ -1,6 +1,7 @@
 package com.example.CompProductSystem.api.Product.dto.response;
 
 import com.example.CompProductSystem.api.PriceInfo.PriceInfo;
+import com.example.CompProductSystem.api.PriceInfo.dto.response.PriceInfoResponse;
 import com.example.CompProductSystem.api.Product.Product;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,20 +14,13 @@ import java.util.List;
 @Builder
 @Getter
 public class ProductDetailResponse {
-    private String name;
-    private LocalDateTime releaseDate;// 등록 월
-    private String imageUrl; // s3를 활용한 이미지 링크 필드
-    private Long lowestPrice;
-    private String ShopName;
-    private Long price;
-    private Integer deliveryFee;
-    private String linkUrl; // 제휴 링크
+    private ProductResponse productResponse;
+    private List<PriceInfoResponse> priceInfoResponseList;
 
-
-    public static ProductDetailResponse from(PriceInfo priceInfo){
-
+    public static ProductDetailResponse from(List<PriceInfo> priceInfoList,Product product){
         return ProductDetailResponse.builder()
-                .price(priceInfo.getPrice())
+                .priceInfoResponseList(PriceInfoResponse.toListFrom(priceInfoList))
+                .productResponse(ProductResponse.from(product))
                 .build();
     }
 }

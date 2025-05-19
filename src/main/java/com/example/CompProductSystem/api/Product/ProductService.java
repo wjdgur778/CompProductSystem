@@ -13,11 +13,20 @@ import com.example.CompProductSystem.api.Product.dto.request.TvRequest;
 import com.example.CompProductSystem.api.Product.dto.response.ProductDetailResponse;
 import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +36,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductSearchRepo productSearchRepo;
     private final PriceInfoRepository priceInfoRepository;
+    private final ConcurrentHashMap<Long, AtomicLong> viewCountCache = new ConcurrentHashMap<>();
 
     /**
      * 특정 카테고리에 속한 상품들을 페이징하여 조회하는 메서드
@@ -77,12 +87,47 @@ public class ProductService {
      * @return 해당 상품의 상세 정보를 ProductDetailResponse DTO로 변환한 결과
      * @throws IllegalArgumentException 상품 ID가 존재하지 않는 경우
      */
-    public List<ProductDetailResponse> getProductById(Long id) {
-//        Product product = priceInfos.get(0).getProduct();
-        return priceInfoRepository.findAllByProductIdOrderByPriceAsc(id).stream()
-                .map(ProductDetailResponse::from)
-                .collect(Collectors.toList());
-    }   
+    public ProductDetailResponse getProductById(Long id) {
+
+        incrementViewCount(id);// 조회수 증가
+        Product product = productRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException());
+        List<PriceInfo> priceInfoList = priceInfoRepository.findByProductIdOrderByPriceAsc(id);
+
+        return ProductDetailResponse.from(priceInfoList,product);
+    }
+
+    /**
+     * @apiNote 조회수 증가 (메모리 캐시에서 관리)
+     */
+    public void incrementViewCount(Long productId) {
+        viewCountCache.computeIfAbsent(productId, id -> new AtomicLong(0)).incrementAndGet();
+    }
+
+    /**
+     * @apiNote 캐시에서 조회수 가져오기
+     */
+    public Long getViewCount(Long productId) {
+        return viewCountCache.getOrDefault(productId, new AtomicLong(0)).get();
+    }
+
+    //
+    /**
+     * @apiNote 주기적으로 DB에 반영 (Scheduled Task)
+     */
+    @Scheduled(fixedRate = 60000) // 10초마다 DB 업데이트
+    public void syncViewCountsToDB() {
+
+        for (Iterator<Map.Entry<Long, AtomicLong>> it = viewCountCache.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, AtomicLong> entry = it.next();
+            long viewCount = entry.getValue().getAndSet(0);
+            if (viewCount > 0) {
+                productRepository.updateViewCount(entry.getKey(), viewCount);
+            } else {
+                it.remove(); // 조회수 0이면 캐시에서 제거
+            }
+        }
+    }
 
     /**
      * @apiNote 특정 ID의 상품을 삭제

@@ -5,8 +5,10 @@ import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Laptop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     @Query("select p from Product p where p.categoryPath like :path% order by p.lowestPrice asc")
     Page<Product> findByCategoryPathOrderByPrice(@Param("path") String path, Pageable pageable);
 
-
-
+    @Modifying
+    @Transactional
+    @Query("update Product p set p.viewCount = p.viewCount + :count WHERE p.id = :productId")
+    void updateViewCount(@Param("productId")Long productId, @Param("count")Long count);
 }

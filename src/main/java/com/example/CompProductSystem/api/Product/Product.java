@@ -53,6 +53,7 @@ public abstract class Product extends BaseTimeEntity {
         this.name = name;
         this.imageUrl = imageUrl;
         this.member = member;
+        this.viewCount = 0l;
         this.category = category;
         this.categoryPath = category.getPath();
     }

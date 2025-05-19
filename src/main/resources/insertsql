@@ -37,14 +37,15 @@ BEGIN
         INSERT INTO `product` (
             `lmonitor_size`, `category_id`, `lowest_price`, `member_id`,
             `release_time`, `update_time`, `dtype`, `category_path`,
-            `image_url`, `name`
+            `image_url`, `name`,`view_count`
         ) VALUES (
             15.6 + (RAND() * 2.0), category_id, base_price, member_id,
             DATE_SUB(NOW(), INTERVAL FLOOR(1 + RAND() * 365) DAY),
             NOW(),
             'laptop', 'root/컴퓨터/노트북',
             CONCAT('https://example.com/notebook', i, '.jpg'),
-            CONCAT('맥북 프로 ', i, '세대')
+            CONCAT('맥북 프로 ', i, '세대'),
+            0
         );
 
         SET i = i + 1;
@@ -60,7 +61,7 @@ BEGIN
         INSERT INTO `product` (
             `tmonitor_size`, `category_id`, `lowest_price`, `member_id`,
             `release_time`, `update_time`, `dtype`, `category_path`,
-            `image_url`, `name`
+            `image_url`, `name`,`view_count`
         ) VALUES (
             6.0 + (RAND() * 2.0), category_id, base_price, member_id,
             DATE_SUB(NOW(), INTERVAL FLOOR(1 + RAND() * 365) DAY),
@@ -68,6 +69,7 @@ BEGIN
             'tv', 'root/전자제품/스마트폰',
             CONCAT('https://example.com/phone', i, '.jpg'),
             CONCAT('갤럭시 S', i)
+            ,0
         );
 
         SET i = i + 1;
@@ -83,7 +85,7 @@ BEGIN
         INSERT INTO `product` (
             `category_id`, `lowest_price`, `member_id`,
             `release_time`, `update_time`, `dtype`, `category_path`, `color`,
-            `image_url`, `name`
+            `image_url`, `name`,`view_count`
         ) VALUES (
             category_id, base_price, member_id,
             DATE_SUB(NOW(), INTERVAL FLOOR(1 + RAND() * 365) DAY),
@@ -91,7 +93,8 @@ BEGIN
             'furniture', 'root/가전제품/냉장고',
             ELT(FLOOR(1 + RAND() * 3), '스테인리스', '화이트', '블랙'),
             CONCAT('https://example.com/fridge', i, '.jpg'),
-            CONCAT('삼성 냉장고 ', i, '세대')
+            CONCAT('삼성 냉장고 ', i, '세대'),
+            0
         );
 
         SET i = i + 1;
@@ -107,14 +110,15 @@ BEGIN
         INSERT INTO `product` (
             `tmonitor_size`, `category_id`, `lowest_price`, `member_id`,
             `release_time`, `update_time`, `dtype`, `category_path`,
-            `image_url`, `name`
+            `image_url`, `name`,`view_count`
         ) VALUES (
             10.5 + (RAND() * 3.0), category_id, base_price, member_id,
             DATE_SUB(NOW(), INTERVAL FLOOR(1 + RAND() * 365) DAY),
             NOW(),
             'tv', 'root/전자제품/태블릿',
             CONCAT('https://example.com/tablet', i, '.jpg'),
-            CONCAT('아이패드 ', i, '세대')
+            CONCAT('아이패드 ', i, '세대'),
+            0
         );
 
         SET i = i + 1;
@@ -130,7 +134,7 @@ BEGIN
         INSERT INTO `product` (
             `category_id`, `lowest_price`, `member_id`,
             `release_time`, `update_time`, `dtype`, `category_path`, `color`,
-            `image_url`, `name`
+            `image_url`, `name`,`view_count`
         ) VALUES (
             category_id, base_price, member_id,
             DATE_SUB(NOW(), INTERVAL FLOOR(1 + RAND() * 365) DAY),
@@ -138,7 +142,8 @@ BEGIN
             'furniture', 'root/가전제품/세탁기',
             ELT(FLOOR(1 + RAND() * 3), '화이트', '스테인리스', '블랙'),
             CONCAT('https://example.com/washing', i, '.jpg'),
-            CONCAT('LG 세탁기 ', i, '세대')
+            CONCAT('LG 세탁기 ', i, '세대'),
+            0
         );
 
         SET i = i + 1;

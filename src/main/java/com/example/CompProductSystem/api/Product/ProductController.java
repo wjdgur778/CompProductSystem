@@ -100,6 +100,9 @@ public class ProductController {
                         .build());
     }
 
+    /**
+     * @apiNote 상품 상세 검색
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Result> getProductById(@PathVariable(name = "id") Long id) {
         System.out.println(id);
