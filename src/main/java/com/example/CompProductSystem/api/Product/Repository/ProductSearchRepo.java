@@ -52,6 +52,7 @@ public class ProductSearchRepo {
                 .where(colorEq(condition))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                //todo: 정렬 조건 추가
                 .fetch()
                 .stream()
                 .map(ProductResponse::from)
@@ -101,6 +102,7 @@ public class ProductSearchRepo {
                 .where(TMonitorSizeCondition(condition))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                //todo: 정렬 조건 추가
                 .fetch()
                 .stream()
                 .map(ProductResponse::from)

@@ -2,13 +2,16 @@ package com.example.CompProductSystem.api.Order;
 
 import com.example.CompProductSystem.api.Member.Member;
 import com.example.CompProductSystem.api.Product.Product;
+import com.example.CompProductSystem.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderProduct {
+public class OrderProduct extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +21,9 @@ public class OrderProduct {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
+
+    private int quantity;
+
 
     @Builder
     protected OrderProduct(Member member, Product product) {

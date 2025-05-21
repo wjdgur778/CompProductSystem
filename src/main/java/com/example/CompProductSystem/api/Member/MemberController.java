@@ -17,17 +17,5 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/member")
 public class MemberController {
 
-    private final MemberRepository repository;
-    @GetMapping("/")
-    public ResponseEntity<Result> getMembers(){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(Result.builder()
-                        .data( repository.findAll().stream()
-                                .flatMap(member -> member.getProducts().stream())
-                                .map(Product::getName)
-                                .collect(Collectors.toList()))
-                        .build()
-                );
-    }
 
 }

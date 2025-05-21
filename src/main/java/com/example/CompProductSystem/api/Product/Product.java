@@ -67,15 +67,15 @@ public abstract class Product extends BaseTimeEntity {
      * @param member
      */
 
-    public void changeMember(Member member) {
-        if (this.member != null) {
-            this.member.getProducts().remove(this);
-        }
-        this.member = member;
-        if (member != null) {
-            member.getProducts().add(this);
-        }
-    }
+//    public void changeMember(Member member) {
+//        if (this.member != null) {
+//            this.member.getProducts().remove(this);
+//        }
+//        this.member = member;
+//        if (member != null) {
+//            member.getProducts().add(this);
+//        }
+//    }
 
     public void changeCategory(Category category) {
         this.category = category;

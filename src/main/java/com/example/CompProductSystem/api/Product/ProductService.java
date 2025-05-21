@@ -13,14 +13,14 @@ import com.example.CompProductSystem.api.Product.dto.request.TvRequest;
 import com.example.CompProductSystem.api.Product.dto.response.ProductDetailResponse;
 import com.example.CompProductSystem.api.Product.dto.response.ProductResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +37,7 @@ public class ProductService {
     private final ProductSearchRepo productSearchRepo;
     private final PriceInfoRepository priceInfoRepository;
     private final ConcurrentHashMap<Long, AtomicLong> viewCountCache = new ConcurrentHashMap<>();
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 특정 카테고리에 속한 상품들을 페이징하여 조회하는 메서드
@@ -78,46 +79,141 @@ public class ProductService {
      * @return 검색 조건에 맞는 상품 목록을 페이징하여 ProductResponse DTO로 변환한 결과
      */
     public Page<ProductResponse> searchProducts(ProductSearchCondition condition, Pageable pageable) {
-        return productSearchRepo.searchProducts(condition, pageable);
+        Page<ProductResponse> productResponses = productSearchRepo.searchProducts(condition, pageable);
+
+        // productResponses에서 상품 ID를 추출
+        List<Long> productIds = productResponses.getContent().stream()
+                .map(ProductResponse::getId)
+                .toList();
+
+        // Redis에서 조회수 가져오기
+        // @return Map<Long, Long> 형태로 상품 ID와 조회수 매핑
+        Map<Long, Long> values = getViewCountFromRedis(productIds);
+
+        List<ProductResponse> updatedContent = productResponses.getContent().stream()
+                .map(dto -> {
+                    dto.setViewCount(values.getOrDefault(dto.getId(), 0L));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(updatedContent, pageable, productResponses.getTotalElements());
     }
 
     /**
-     * @apiNote 특정 상품 ID에 따른 상품 상세 정보 조회
      * @param id 조회할 상품의 ID
      * @return 해당 상품의 상세 정보를 ProductDetailResponse DTO로 변환한 결과
      * @throws IllegalArgumentException 상품 ID가 존재하지 않는 경우
+     * @apiNote 특정 상품 ID에 따른 상품 상세 정보 조회
      */
     public ProductDetailResponse getProductById(Long id) {
 
-        incrementViewCount(id);// 조회수 증가
+//        incrementViewCount(id);// 조회수 증가
+        incrementViewCountRedis(id);// Redis 조회수 증가
+
         Product product = productRepository.findById(id)
-                .orElseThrow(()->new IllegalArgumentException());
+                .orElseThrow(() -> new IllegalArgumentException());
         List<PriceInfo> priceInfoList = priceInfoRepository.findByProductIdOrderByPriceAsc(id);
 
-        return ProductDetailResponse.from(priceInfoList,product);
+        return ProductDetailResponse.from(priceInfoList, product);
     }
 
     /**
-     * @apiNote 조회수 증가 (메모리 캐시에서 관리)
+     * @param id 삭제할 상품의 ID
+     * @apiNote 특정 ID의 상품을 삭제
+     */
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다."));
+        productRepository.deleteById(id);
+    }
+
+    /**
+     * @param laptopRequest 노트북 상품 정보
+     * @return 생성된 노트북 상품 정보
+     * @apiNote 노트북 상품 생성
+     */
+    public Product createLaptop(LaptopRequest laptopRequest) {
+        Category category = categoryRepository.findById(laptopRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+        return productRepository.save(laptopRequest.toEntity(laptopRequest, category));
+    }
+
+    /**
+     * @param tvRequest 텔레비전 상품 정보
+     * @return 생성된 텔레비전 상품 정보
+     * @apiNote 텔레비전 상품 생성
+     */
+    public Product createTV(TvRequest tvRequest) {
+        Category category = categoryRepository.findById(tvRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+        return productRepository.save(tvRequest.toEntity(tvRequest, category));
+    }
+
+    /**
+     * @param furnitureRequest 가구 상품 정보
+     * @return 생성된 가구 상품 정보
+     * @apiNote 가구 상품 생성
+     */
+    public Product createFurniture(FurnitureRequest furnitureRequest) {
+        Category category = categoryRepository.findById(furnitureRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+        return productRepository.save(furnitureRequest.toEntity(furnitureRequest, category));
+    }
+
+
+    /**
+     * @apiNote (ConcurrentHashMap 사용)
+     * 조회수 증가 (메모리 캐시에서 관리)
      */
     public void incrementViewCount(Long productId) {
         viewCountCache.computeIfAbsent(productId, id -> new AtomicLong(0)).incrementAndGet();
     }
 
     /**
-     * @apiNote 캐시에서 조회수 가져오기
+     * @apiNote (Redis 사용)
+     * 조회수 증가 (캐시에서 관리)
+     */
+    public void incrementViewCountRedis(Long productId) {
+        redisTemplate.opsForValue().increment("product:viewCount:" + productId);
+    }
+
+    /**
+     * @apiNote concurrentHashMap 에서 조회수 가져오기
      */
     public Long getViewCount(Long productId) {
         return viewCountCache.getOrDefault(productId, new AtomicLong(0)).get();
     }
 
+    /**
+     * @apiNote Redis에서 조회수 가져오기
+     */
+    public Map<Long, Long> getViewCountFromRedis(List<Long> productIds) {
+        List<String> keys = productIds.stream()
+                .map(productId -> "product:viewCount:" + productId)
+                .collect(Collectors.toList());
+
+        Map<Long, Long> result = new HashMap<>();
+        // Redis에서 조회수 가져오기
+        List<Object> redisvalues = redisTemplate.opsForValue().multiGet(keys);
+
+        // 조회수 결과를 Map에 저장
+        for (int i = 0; i < productIds.size(); i++) {
+            Long productId = productIds.get(i);
+            Long viewCount = (Long) redisvalues.get(i);
+            result.put(productId, viewCount);
+        }
+
+        return result;
+    }
+
     //
+
     /**
      * @apiNote 주기적으로 DB에 반영 (Scheduled Task)
      */
     @Scheduled(fixedRate = 60000) // 10초마다 DB 업데이트
     public void syncViewCountsToDB() {
-
         for (Iterator<Map.Entry<Long, AtomicLong>> it = viewCountCache.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Long, AtomicLong> entry = it.next();
             long viewCount = entry.getValue().getAndSet(0);
@@ -129,46 +225,4 @@ public class ProductService {
         }
     }
 
-    /**
-     * @apiNote 특정 ID의 상품을 삭제
-     * @param id 삭제할 상품의 ID
-     */
-    public void deleteProduct(Long id) {
-        Product product = productRepository.findById(id)
-                        .orElseThrow(()->new IllegalArgumentException("해당 상품이 없습니다."));
-        productRepository.deleteById(id);
-    }
-
-    /**
-     * @apiNote 노트북 상품 생성
-     * @param laptopRequest 노트북 상품 정보
-     * @return 생성된 노트북 상품 정보
-     */     
-    public Product createLaptop(LaptopRequest laptopRequest) {
-        Category category = categoryRepository.findById(laptopRequest.getCategoryId())
-                .orElseThrow(()-> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        return productRepository.save(laptopRequest.toEntity(laptopRequest,category));
-    }
-
-    /**
-     * @apiNote 텔레비전 상품 생성
-     * @param tvRequest 텔레비전 상품 정보
-     * @return 생성된 텔레비전 상품 정보
-     */
-    public Product createTV(TvRequest tvRequest) {
-        Category category = categoryRepository.findById(tvRequest.getCategoryId())
-                .orElseThrow(()-> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        return productRepository.save(tvRequest.toEntity(tvRequest,category));
-    }
-
-    /**
-     * @apiNote 가구 상품 생성
-     * @param furnitureRequest 가구 상품 정보
-     * @return 생성된 가구 상품 정보
-     */
-    public Product createFurniture(FurnitureRequest furnitureRequest) {
-        Category category = categoryRepository.findById(furnitureRequest.getCategoryId())
-                .orElseThrow(()-> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        return productRepository.save(furnitureRequest.toEntity(furnitureRequest,category));
-    }
 }

@@ -5,6 +5,8 @@ import com.example.CompProductSystem.api.Product.Product;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Furniture;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.Laptop;
 import com.example.CompProductSystem.api.Product.ProdutsDetailEntity.TV;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,10 +19,11 @@ import java.util.List;
  * 상품이름, 등록 월, 이미지링크, 쇼핑몰별 가격정보리스트(제휴 링크, 가격, 배달비)
  */
 @Getter
+@AllArgsConstructor
 @Builder
 public class ProductResponse {
-    private final Long id;
-    private final String name;
+    private Long id;
+    private String name;
     private LocalDateTime releaseDate;// 등록 월
     private String imageUrl; // s3를 활용한 이미지 링크 필드
     private Long lowestPrice;
@@ -54,4 +57,16 @@ public class ProductResponse {
                 .details(detail)
                 .build();
     }
+
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    // projection을 위한 생성자
+    public ProductResponse(Long id, String name, Long lowestPrice) {
+        this.id = id;
+        this.name = name;
+        this.lowestPrice = lowestPrice;
+    }
+
 }

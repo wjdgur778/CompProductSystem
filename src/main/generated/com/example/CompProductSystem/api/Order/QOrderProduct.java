@@ -22,11 +22,21 @@ public class QOrderProduct extends EntityPathBase<OrderProduct> {
 
     public static final QOrderProduct orderProduct = new QOrderProduct("orderProduct");
 
+    public final com.example.CompProductSystem.common.QBaseTimeEntity _super = new com.example.CompProductSystem.common.QBaseTimeEntity(this);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final com.example.CompProductSystem.api.Member.QMember member;
 
     public final com.example.CompProductSystem.api.Product.QProduct product;
+
+    public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> releaseTime = _super.releaseTime;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
     public QOrderProduct(String variable) {
         this(OrderProduct.class, forVariable(variable), INITS);
