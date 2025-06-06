@@ -37,6 +37,8 @@ public class RedisConfig {
         // 키와 값의 직렬화 방식을 설정합니다.
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new StringRedisSerializer());
         // 또 다른 유용한 설정
 
         return template;

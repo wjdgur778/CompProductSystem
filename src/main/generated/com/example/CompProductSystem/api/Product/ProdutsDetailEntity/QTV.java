@@ -37,6 +37,9 @@ public class QTV extends EntityPathBase<TV> {
     public final StringPath imageUrl;
 
     //inherited
+    public final NumberPath<Long> likeCount;
+
+    //inherited
     public final NumberPath<Long> lowestPrice;
 
     // inherited
@@ -79,6 +82,7 @@ public class QTV extends EntityPathBase<TV> {
         this.categoryPath = _super.categoryPath;
         this.id = _super.id;
         this.imageUrl = _super.imageUrl;
+        this.likeCount = _super.likeCount;
         this.lowestPrice = _super.lowestPrice;
         this.member = _super.member;
         this.name = _super.name;

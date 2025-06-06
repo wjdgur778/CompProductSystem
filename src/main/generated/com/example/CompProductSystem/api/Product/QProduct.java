@@ -32,6 +32,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath imageUrl = createString("imageUrl");
 
+    public final NumberPath<Long> likeCount = createNumber("likeCount", Long.class);
+
     public final NumberPath<Long> lowestPrice = createNumber("lowestPrice", Long.class);
 
     public final com.example.CompProductSystem.api.Member.QMember member;

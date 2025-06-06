@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -86,19 +87,16 @@ public class ProductService {
                 .map(ProductResponse::getId)
                 .toList();
 
-        // Redis에서 조회수 가져오기
-        // @return Map<Long, Long> 형태로 상품 ID와 조회수 매핑
-        Map<Long, Long> values = getViewCountFromRedis(productIds);
 
-        List<ProductResponse> updatedContent = productResponses.getContent().stream()
-                .map(dto -> {
-                    dto.setViewCount(values.getOrDefault(dto.getId(), 0L));
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        // Redis에서 조회수와 좋아요수를 가져오는 메서드 호출
+        List<Map<Object, Object>> values = getViewCountFromRedis(productIds);
+
+        // Redis에서 가져온 조회수와 좋아요수를 productResponses에 병합
+        List<ProductResponse> updatedContent = mergeProductResponses(productResponses.getContent(), values);
 
         return new PageImpl<>(updatedContent, pageable, productResponses.getTotalElements());
     }
+
 
     /**
      * @param id 조회할 상품의 ID
@@ -175,7 +173,7 @@ public class ProductService {
      * 조회수 증가 (캐시에서 관리)
      */
     public void incrementViewCountRedis(Long productId) {
-        redisTemplate.opsForValue().increment("product:viewCount:" + productId);
+        redisTemplate.opsForHash().increment("product:" + productId, "viewCount", 1L);
     }
 
     /**
@@ -185,34 +183,49 @@ public class ProductService {
         return viewCountCache.getOrDefault(productId, new AtomicLong(0)).get();
     }
 
+
     /**
-     * @apiNote Redis에서 조회수 가져오기
+     * @apiNote Redis에서 조회수와 좋아요수를 가져오기
      */
-    public Map<Long, Long> getViewCountFromRedis(List<Long> productIds) {
+    public List<Map<Object, Object>> getViewCountFromRedis(List<Long> productIds) {
         List<String> keys = productIds.stream()
-                .map(productId -> "product:viewCount:" + productId)
+                .map(productId -> "product:" + productId)
                 .collect(Collectors.toList());
 
-        Map<Long, Long> result = new HashMap<>();
-        // Redis에서 조회수 가져오기
-        List<Object> redisvalues = redisTemplate.opsForValue().multiGet(keys);
+        List<Map<Object, Object>> redisValues = keys.stream()
+                .map(key -> redisTemplate.opsForHash().entries(key))
+                .toList();
 
-        // 조회수 결과를 Map에 저장
-        for (int i = 0; i < productIds.size(); i++) {
-            Long productId = productIds.get(i);
-            Long viewCount = (Long) redisvalues.get(i);
-            result.put(productId, viewCount);
-        }
-
-        return result;
+        return redisValues;
     }
 
-    //
+    /**
+     * @apiNote Redis에서 가져온 조회수와 좋아요수를 ProductResponse에 병합
+     * @param content
+     * @param values
+     * @return
+     */
+    private List<ProductResponse> mergeProductResponses(List<ProductResponse> content, List<Map<Object, Object>> values) {
+        return IntStream.range(0, content.size())
+                .mapToObj(i -> {
+                    ProductResponse productResponse = content.get(i);
+                    Map<Object, Object> value = values.get(i);
+                    //String to Long
+                    Long viewCount = Long.valueOf((String)value.getOrDefault("viewCount", 0L + ""));
+                    Long likeCount = Long.valueOf((String)value.getOrDefault("likeCount", 0L + ""));
+                    // 조회수와 좋아요수를 ProductResponse에 설정
+                    productResponse.setViewCount(viewCount);
+                    productResponse.setLikeCount(likeCount);
+
+                    return productResponse;
+                }).collect(Collectors.toList());
+    }
+
 
     /**
      * @apiNote 주기적으로 DB에 반영 (Scheduled Task)
      */
-    @Scheduled(fixedRate = 60000) // 10초마다 DB 업데이트
+//    @Scheduled(fixedRate = 60000) // 10초마다 DB 업데이트
     public void syncViewCountsToDB() {
         for (Iterator<Map.Entry<Long, AtomicLong>> it = viewCountCache.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Long, AtomicLong> entry = it.next();

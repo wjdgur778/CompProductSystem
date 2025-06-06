@@ -29,6 +29,7 @@ public class ProductResponse {
     private Long lowestPrice;
     private Object details; // LaptopResponse, FurnitureResponse 등을 담기 위한 필드
     private Long viewCount;
+    private Long likeCount;
 
     public static ProductResponse from(Product product) {
         Object detail=null;
@@ -60,6 +61,9 @@ public class ProductResponse {
 
     public void setViewCount(Long viewCount) {
         this.viewCount = viewCount;
+    }
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
     }
 
     // projection을 위한 생성자

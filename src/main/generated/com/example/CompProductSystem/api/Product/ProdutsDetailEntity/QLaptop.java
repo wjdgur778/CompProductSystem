@@ -36,6 +36,9 @@ public class QLaptop extends EntityPathBase<Laptop> {
     //inherited
     public final StringPath imageUrl;
 
+    //inherited
+    public final NumberPath<Long> likeCount;
+
     public final NumberPath<Double> LMonitorSize = createNumber("LMonitorSize", Double.class);
 
     //inherited
@@ -79,6 +82,7 @@ public class QLaptop extends EntityPathBase<Laptop> {
         this.categoryPath = _super.categoryPath;
         this.id = _super.id;
         this.imageUrl = _super.imageUrl;
+        this.likeCount = _super.likeCount;
         this.lowestPrice = _super.lowestPrice;
         this.member = _super.member;
         this.name = _super.name;
